@@ -31,8 +31,9 @@ def assign_session():
             raise ValueError("No unassigned sessions available.")
         select_random_sess = random.choice(unassigned_sess)
         doc[select_random_sess][1] = 'assigned'
-
+    print('finished and lock released')
     with lock_sess:
+        print('here to write')
         with open('session.json', 'w') as f:
             json.dump(doc, f, indent=4)
 
