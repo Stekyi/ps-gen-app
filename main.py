@@ -6,7 +6,7 @@ top_container = st.container()
 down_container = st.container()
 with top_container:
     st.write('''Keep your passport safe. The assigned session ID can only be used once. 
-            \n click the button is visible below to access your passport and session ID''')
+            \n click the button below, if visible, to access your passport and session ID''')
 
 with down_container:
     place_hold = st.empty()
