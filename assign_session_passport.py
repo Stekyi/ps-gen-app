@@ -3,8 +3,8 @@ from filelock import FileLock
 import random
 
 def assign_passport():
-    lock = FileLock('passport.json.lock')
-    with lock:
+    lock_pass = FileLock('passport.json.lock')
+    with lock_pass:
         with open('passport.json', 'r') as f:
             doc = json.load(f)
 
@@ -14,14 +14,15 @@ def assign_passport():
         select_random_pass = random.choice(unassigned_pass)
         doc[select_random_pass][1] = 'assigned'
 
+    with lock_pass:
         with open('passport.json', 'w') as f:
             json.dump(doc, f, indent=4)
 
     return select_random_pass
 
 def assign_session():
-    lock = FileLock('session.json.lock')
-    with lock:
+    lock_sess = FileLock('session.json.lock')
+    with lock_sess:
         with open('session.json', 'r') as f:
             doc = json.load(f)
 
@@ -31,6 +32,7 @@ def assign_session():
         select_random_sess = random.choice(unassigned_sess)
         doc[select_random_sess][1] = 'assigned'
 
+    with lock_sess:
         with open('session.json', 'w') as f:
             json.dump(doc, f, indent=4)
 
