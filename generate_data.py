@@ -7,7 +7,7 @@ import streamlit as st
 
 if not firebase_admin._apps:
     try:
-        cred = credentials.Certificate('ps-gen-app-firebase-adminsdk-fbsvc-5ebdb64a45.json')
+        cred = credentials.Certificate('ps-gen-app-firebase-admin.json')
     except Exception as e:
         fb_config = st.secrets('firebase')
         cred = credentials.Certificate(fb_config)
