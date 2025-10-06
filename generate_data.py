@@ -9,7 +9,7 @@ if not firebase_admin._apps:
     try:
         cred = credentials.Certificate('ps-gen-app-firebase-admin.json')
     except Exception as e:
-        fb_config = st.secrets['firebase']
+        fb_config = dict(st.secrets['firebase'])
         cred = credentials.Certificate(fb_config)
 
     firebase_admin.initialize_app(cred, {
