@@ -1,11 +1,12 @@
 import json
 from typing import TypedDict
+import random as rd
 
 class GenNumber(TypedDict):
     gen_num: list
 
 def generate_passport(state: GenNumber) -> GenNumber:
-    number_pool = [numb for numb in range(10000, 99999)]
+    number_pool = rd.sample(range(10000, 99999), 100)
     for i in number_pool:
         passport = 'P1'+str(i)
         state[passport] = [passport, 'unassigned']
@@ -24,7 +25,7 @@ def dump_passport_data():
 
 
 def generate_session(state: GenNumber) -> GenNumber:
-    number_pool = [numb for numb in range(10000, 99999)]
+    number_pool = rd.sample(range(10000, 99999),100)
     for i in number_pool:
         sess_id = 'S1' + str(i)
         state[sess_id] = [sess_id, 'unassigned']
