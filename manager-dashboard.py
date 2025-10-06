@@ -60,6 +60,7 @@ with col3:
                 gd.dump_passport_data()
                 gd.dump_session_data()
                 st.write('New Numbers Generated, refresh page to load')
+                number_placeholder.text(f'Assigned Pass and Sess_id: *** {count_of_pass} ***  ')
 
 
 
