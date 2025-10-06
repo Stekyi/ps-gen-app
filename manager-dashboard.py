@@ -6,8 +6,8 @@ st.title('Dashboard')
 col1, col2, col3 = st.columns([4,4,4])
 
 with col1:
-    with open('passport.json') as f:
-        passports = json.load(f)
+    #with open('passport.json') as f:
+    passports =  gd.get_pass_data()
 
     assigned_passports = [v for _, v in passports.items()]
     df_assigned_passports = pd.DataFrame(assigned_passports, columns=['passport#', 'status'])
@@ -25,8 +25,8 @@ with col1:
 
 
 with col2:
-    with open('session.json') as f:
-        sessions = json.load(f)
+    #with open('session.json') as f:
+    sessions = gd.get_sess_data()
 
     assigned_session = [v for _, v in sessions.items() ]
     df_assigned_session = pd.DataFrame(assigned_session, columns=['session_id', 'status'])
