@@ -55,7 +55,7 @@ with col2:
     assigned_session = [v for _, v in sessions.items() ]
 
     assigned, unassigned = [sum(status == s for _,status, _,_ in assigned_session) for s in ("assigned", "unassigned")]
-    if assigned / unassigned < 0.25:
+    if assigned / unassigned < 0.10:
         df_assigned_session = pd.DataFrame(assigned_session, columns=['passport#', 'status', 'Type_of_ID', 'Batch'])
         df_assigned_session['status'] = ''
     else:
