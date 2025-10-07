@@ -59,7 +59,7 @@ with col2:
         df_assigned_session = pd.DataFrame(assigned_session, columns=['passport#', 'status', 'Type_of_ID', 'Batch'])
         df_assigned_session['status'] = ''
     else:
-        df_assigned_passports = pd.DataFrame(assigned_session, columns=['passport#', 'status', 'Type_of_ID', 'Batch'])
+        df_assigned_session = pd.DataFrame(assigned_session, columns=['passport#', 'status', 'Type_of_ID', 'Batch'])
 
     st.dataframe(df_assigned_session)
     # Convert to CSV for download

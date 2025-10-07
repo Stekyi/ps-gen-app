@@ -22,26 +22,42 @@ ref_sess = db.reference('sessions')
 ref_pass = db.reference('passports')
 
 
-def assign_passport():
+def assign_passport(pass_num):
     """Assigns a random unassigned passport and marks it as assigned."""
     # Get fresh data from Firebase
     pass_ref = ref_pass.get()
+    #print(pass_ref)
+    pass_data = [v for k,v in pass_ref.items() if k== pass_num ]
+    #print(pass_data)
 
-    if not pass_ref:
-        raise ValueError("No passports found in database.")
 
-    unassigned_pass = [k for k, v in pass_ref.items() if v[1] == 'unassigned']
 
-    if not unassigned_pass:
-        raise ValueError("No unassigned passports available.")
+    if not pass_data:
+        #raise ValueError("No passports found in database.")
+        return False
+    else:
+        #print(12)
+        if pass_data[0][1] == 'assigned':
+            #print(23)
+            return False
+        else:
+            #print(34)
+            pass_ref[pass_num][1] = 'assigned'
+            #print(45)
+            ref_pass.child(pass_num).set(pass_ref[pass_num])
 
-    select_random_pass = random.choice(unassigned_pass)
-    pass_ref[select_random_pass][1] = 'assigned'
+            return True
+
+    #unassigned_pass = [k for k, v in pass_ref.items() if v[1] == 'unassigned']
+
+    #if not unassigned_pass:
+    #    raise ValueError("No unassigned passports available.")
+
+    #select_random_pass = random.choice(unassigned_pass)
 
     # Update Firebase
-    ref_pass.child(select_random_pass).set(pass_ref[select_random_pass])
 
-    return select_random_pass
+
 
 
 def assign_session():
@@ -68,9 +84,12 @@ def assign_session():
 
 if __name__ == '__main__':
     try:
-        pass_num = assign_passport()
-        sess_id = assign_session()
-        print(f'Your passport is {pass_num} and your session is {sess_id}')
+        pass_num = assign_passport('PDB435065') #     PDB461044 PDB474185
+        if pass_num:
+            sess_id = assign_session()
+            print(f'Your passport is {pass_num} and your session is {sess_id}')
+        else:
+            print('Number not valid or already utilised')
     except ValueError as e:
         print(f"Error: {e}")
     except Exception as e:
