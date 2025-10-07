@@ -2,8 +2,10 @@ import json
 from typing import TypedDict
 import random as rd
 import firebase_admin
-from firebase_admin import db, credentials
+from firebase_admin import  credentials, db
 import streamlit as st
+
+
 
 if not firebase_admin._apps:
     try:
@@ -20,21 +22,36 @@ sess_ref = db.reference('sessions')
 pass_ref = db.reference('passports')
 
 
+def get_existing_batches():
+    existing_batches = set()
+    data = pass_ref.get()
+    if data:
+        for _, value in data.items():
+            existing_batches.add(value[3])
+    return existing_batches
+
+def reset_data():
+    pass_ref.set({})
+    sess_ref.set({})
+
 class GenNumber(TypedDict):
     gen_num: list
 
-def generate_passport(state: GenNumber) -> GenNumber:
-    number_pool = rd.sample(range(10000, 99999), 100)
+def generate_passport(state: GenNumber, num_of_id, type_of_pass, batch_num) -> GenNumber:
+    number_pool = rd.sample(range(10000, 99999), num_of_id)
+
     for i in number_pool:
-        passport = 'P1'+str(i)
-        state[passport] = [passport, 'unassigned']
+
+        passport = 'P'+type_of_pass+batch_num+str(i)
+        state[passport] = [passport, 'unassigned', type_of_pass, batch_num]
 
     return state
 
-def dump_passport_data():
-    doc = generate_passport({})
+def dump_passport_data(num_of_id, type_of_pass, batch_num):
+    doc = generate_passport({}, num_of_id, type_of_pass, batch_num )
     try:
-        pass_ref.set(doc)
+
+        pass_ref.update(doc)
 
         #with open('passport.json', 'w') as f:
         #    json.dump(doc, f, indent=4)
@@ -45,20 +62,20 @@ def dump_passport_data():
         return False
 
 
-def generate_session(state: GenNumber) -> GenNumber:
-    number_pool = rd.sample(range(10000, 99999),100)
+def generate_session(state: GenNumber, num_of_id, type_of_pass, batch_num) -> GenNumber:
+    number_pool = rd.sample(range(10000, 99999),num_of_id)
     for i in number_pool:
-        sess_id = 'S1' + str(i)
-        state[sess_id] = [sess_id, 'unassigned']
+        sess_id = 'S'+type_of_pass+batch_num + str(i)
+        state[sess_id] = [sess_id, 'unassigned', type_of_pass, batch_num]
 
     return state
 
 
-def dump_session_data():
-    doc = generate_session({})
+def dump_session_data(num_of_id, type_of_pass, batch_num):
+    doc = generate_session({},num_of_id, type_of_pass, batch_num )
     try:
 
-        sess_ref.set(doc)
+        sess_ref.update(doc)
         #with open('session.json', 'w') as f:
         #    json.dump(doc, f, indent=4)
         return True
@@ -78,5 +95,8 @@ def get_sess_data():
 
 
 if __name__ == '__main__':
-    dump_passport_data()
-    dump_session_data()
+    #dump_passport_data(num_of_id = 100, type_of_pass='D',batch_num='B1' )
+    #dump_session_data(num_of_id = 100, type_of_pass='D', batch_num='B1')
+    reset_data()
+    dump_passport_data(num_of_id=1, type_of_pass='D', batch_num='B0')
+    dump_session_data(num_of_id = 1, type_of_pass='D', batch_num='B0')
