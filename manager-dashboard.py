@@ -9,7 +9,41 @@ STATUS_ASSIGNED = "assigned"
 STATUS_UNASSIGNED = "unassigned"
 
 # Page configuration
-st.set_page_config(page_title="Dashboard Graph", layout="wide")
+st.set_page_config(page_title="Dashboard", layout="wide",
+initial_sidebar_state = "collapsed"
+)
+
+# Hide Streamlit elements using custom CSS
+def hide_streamlit_elements():
+    """Hide default Streamlit UI elements like GitHub icon, Deploy button, and menu."""
+    hide_style = """
+                           <style>
+                           /* Hide GitHub icon */
+                           #MainMenu {visibility: hidden;}
+
+                           /* Hide Streamlit footer */
+                           footer {visibility: hidden;}
+
+                           /* Hide the Deploy button and GitHub toolbar */
+                           .stDeployButton {display: none;}
+
+                           /* Optional: Hide the hamburger menu completely */
+                           header[data-testid="stHeader"] {
+                               display: none;
+                           }
+
+                           /* Optional: Reduce top padding when header is hidden */
+                           .block-container {
+                               padding-top: 2rem;
+                           }
+                           </style>
+                       """
+    st.markdown(hide_style, unsafe_allow_html=True)
+
+
+# Call this function at the start of your app
+hide_streamlit_elements()
+
 st.title('Dashboard')
 
 
