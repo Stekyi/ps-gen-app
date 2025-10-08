@@ -9,8 +9,8 @@ STATUS_ASSIGNED = "assigned"
 STATUS_UNASSIGNED = "unassigned"
 
 # Page configuration
-st.set_page_config(page_title="Dashboard", layout="wide",
-initial_sidebar_state = "collapsed"
+st.set_page_config(page_title="Dashboard", layout="wide"
+
 )
 
 # Hide Streamlit elements using custom CSS
@@ -42,7 +42,7 @@ def hide_streamlit_elements():
 
 
 # Call this function at the start of your app
-hide_streamlit_elements()
+#hide_streamlit_elements()
 
 st.title('Dashboard')
 
