@@ -1,22 +1,20 @@
 import streamlit as st
-#import json
 import pandas as pd
 import generate_data as gd
 from streamlit.components.v1 import html
 
+# Constants
+ALL_BATCHES = [f"B{i}" for i in range(1, 11)]
+STATUS_ASSIGNED = "assigned"
+STATUS_UNASSIGNED = "unassigned"
+
+# Page configuration
 st.set_page_config(page_title="Dashboard Graph", layout="wide")
 st.title('Dashboard')
-col1, col2, col3 = st.columns([4,4,4])
-
-reset_mode = True
-generate = True
-# All available batches
-all_batches = [f"B{i}" for i in range(1, 11)]  # Creates ['B1', 'B2', ..., 'B10']
-existing_batch = gd.get_existing_batches()
-
 
 
 def reload_page():
+    """Reload the current page using JavaScript."""
     html("""
         <script>
             window.parent.location.reload();
@@ -24,96 +22,141 @@ def reload_page():
     """)
 
 
-with col1:
-    #with open('passport.json') as f:
-    passports =  gd.get_pass_data()
+def create_status_dataframe(data_dict, filter_type=None, hide_status_threshold=None):
+    """
+    Create a DataFrame from passport/session data with optional filtering and status hiding.
 
-    assigned_passports = [v for _, v in passports.items()]
-    assigned, unassigned = [sum(status == s for _, status, _,_ in assigned_passports) for s in ("assigned", "unassigned")]
-    if assigned/unassigned < 0.25:
-        df_assigned_passports = pd.DataFrame(assigned_passports, columns=['passport#', 'status', 'Type_of_ID', 'Batch'])
-        df_assigned_passports['status'] = ''
-    else:
-        df_assigned_passports = pd.DataFrame(assigned_passports, columns=['passport#', 'status', 'Type_of_ID', 'Batch'])
-    st.dataframe(df_assigned_passports)
-    # Convert to CSV for download
-    csv = df_assigned_passports.to_csv(index=False).encode('utf-8')
+    Args:
+        data_dict: Dictionary of passport/session data
+        filter_type: Filter by Type_of_ID ('D', 'G', or None for all)
+        hide_status_threshold: If assigned/unassigned ratio is below this, hide status
 
-    # Add a download button
+    Returns:
+        pandas.DataFrame with columns ['passport#', 'status', 'Type_of_ID', 'Batch']
+    """
+    data_list = list(data_dict.values())
+
+    # Apply filter if specified
+    if filter_type and filter_type != 'All':
+        data_list = [item for item in data_list if item[2] == filter_type]
+
+    df = pd.DataFrame(data_list, columns=['passport#', 'status', 'Type_of_ID', 'Batch'])
+
+    if hide_status_threshold is not None and len(data_list) > 0:
+        assigned_count = sum(1 for _, status, _, _ in data_list if status == STATUS_ASSIGNED)
+        unassigned_count = sum(1 for _, status, _, _ in data_list if status == STATUS_UNASSIGNED)
+
+        if unassigned_count > 0 and (assigned_count / unassigned_count) < hide_status_threshold:
+            df['status'] = ''
+
+    return df
+
+
+def render_data_table(data_dict, label, filename, filter_type, hide_status_threshold=None, key_prefix=""):
+    """
+    Render a data table with download button.
+
+    Args:
+        data_dict: Dictionary of data to display
+        label: Label for the download button
+        filename: Filename for CSV download
+        filter_type: Filter by Type_of_ID ('D', 'G', or 'All')
+        hide_status_threshold: Optional threshold for hiding status column
+        key_prefix: Prefix for widget keys to ensure uniqueness
+    """
+    df = create_status_dataframe(data_dict, filter_type=filter_type, hide_status_threshold=hide_status_threshold)
+    st.dataframe(df)
+
+    csv = df.to_csv(index=False).encode('utf-8')
     st.download_button(
-        label="Download pass as CSV",
+        label=label,
         data=csv,
-        file_name='passport_table.csv',
-        mime='text/csv'
+        file_name=filename,
+        mime='text/csv',
+        key=f"{key_prefix}_download"
     )
 
+    # Display count
+    st.caption(f"Showing {len(df)} record(s)")
 
+
+def render_generation_panel():
+    """Render the ID generation panel in the right column."""
+    passports = gd.get_pass_data()
+    assigned_passports = list(passports.values())
+    count_assigned = sum(1 for _, status, _, _ in assigned_passports if status == STATUS_ASSIGNED)
+
+    # Display counter
+    st.text(f'Assigned Pass and Sess_id: *** {count_assigned} ***  ')
+    st.write('Generate fresh session and passport blocks')
+
+    # Get available batches
+    existing_batches = gd.get_existing_batches()
+    available_batches = [b for b in ALL_BATCHES if b not in existing_batches]
+
+    # Input fields
+    number_of_ids = st.number_input('Number of IDs to generate', min_value=0, step=1)
+    type_of_id = st.selectbox('Generate for (D-Delegates, G-General Voter):', ['D', 'G'])
+
+    # Batch selection
+    if available_batches:
+        batch_num = st.selectbox("Select Batch", options=available_batches, index=0)
+        can_generate = True
+    else:
+        st.warning("All batches (B1-B10) are already in use!")
+        batch_num = None
+        can_generate = False
+
+    # Generate button
+    gen_pass = st.button(label='Generate #s')
+
+    if gen_pass:
+        if not can_generate or number_of_ids == 0:
+            st.warning("⚠️ Number of IDs must be greater than 0 and a batch must be available!")
+        else:
+            with st.spinner('Generating, please wait...'):
+                gd.dump_passport_data(number_of_ids, type_of_id, batch_num)
+                gd.dump_session_data(number_of_ids, type_of_id, batch_num)
+                st.success('New Numbers Generated, refresh page to load')
+                reload_page()
+
+
+# Main layout
+col1, col2, col3 = st.columns([4, 4, 4])
+
+# Global filter at the top
+st.sidebar.header("Filter Options")
+filter_option = st.sidebar.radio(
+    "Filter by ID Type:",
+    options=['All', 'D', 'G'],
+    index=0,
+    help="D = Delegates, G = General Voters"
+)
+
+# Left column - Passport data
 with col2:
-    #with open('session.json') as f:
-    sessions = gd.get_sess_data()
-
-    assigned_session = [v for _, v in sessions.items() ]
-
-    assigned, unassigned = [sum(status == s for _,status, _,_ in assigned_session) for s in ("assigned", "unassigned")]
-    if assigned / unassigned < 0.10:
-        df_assigned_session = pd.DataFrame(assigned_session, columns=['passport#', 'status', 'Type_of_ID', 'Batch'])
-        df_assigned_session['status'] = ''
-    else:
-        df_assigned_session = pd.DataFrame(assigned_session, columns=['passport#', 'status', 'Type_of_ID', 'Batch'])
-
-    st.dataframe(df_assigned_session)
-    # Convert to CSV for download
-    csv = df_assigned_session.to_csv(index=False).encode('utf-8')
-
-    # Add a download button
-    st.download_button(
-        label="Download table as CSV",
-        data=csv,
-        file_name='session_table.csv',
-        mime='text/csv'
+    passports = gd.get_pass_data()
+    render_data_table(
+        passports,
+        label="Download pass as CSV",
+        filename="passport_table.csv",
+        filter_type=filter_option,
+        hide_status_threshold=0.25,
+        key_prefix="passport"
     )
 
+# Middle column - Session data
 with col3:
-    top_cont = st.container()
-    bottom_cont = st.container()
-    with bottom_cont:
-        number_placeholder = st.empty()
+    sessions = gd.get_sess_data()
+    render_data_table(
+        sessions,
+        label="Download table as CSV",
+        filename="session_table.csv",
+        filter_type=filter_option,
+        hide_status_threshold=0.10,
+        key_prefix="session"
+    )
 
-    with top_cont:
-        count_of_pass = len(df_assigned_passports[df_assigned_passports['status'] == 'assigned'])
-
-        number_placeholder.text(f'Assigned Pass and Sess_id: *** {count_of_pass} ***  ')
-        st.write('Generate fresh session and passport blocks')
-
-        if reset_mode:
-            number_of_IDs = st.number_input('Number of IDs to generate', step=1)
-            type_of_ID = st.selectbox('Generate for (D-Delegates, G-General Voter ):', ['D', 'G'])
-
-            available_batches = [batch for batch in all_batches if batch not in existing_batch]
-
-            if available_batches:
-                batch_num = st.selectbox(
-                    "Select Batch",
-                    options=available_batches,
-                    index=0
-                )
-                #st.write(f"You selected: {batch_num}")
-            else:
-                st.warning("All batches (B1-B10) are already in use!")
-                generate = False
-                selected_batch = None
-
-            gen_pass = st.button(label='Generate #s')
-
-            if gen_pass & generate:
-                with st.spinner('Generating, please wait'):
-                    gd.dump_passport_data(number_of_IDs, type_of_ID, batch_num)
-                    gd.dump_session_data(number_of_IDs, type_of_ID, batch_num)
-
-                    st.success('New Numbers Generated, refresh page to load')
-                    number_placeholder.text(f'Assigned Pass and Sess_id: *** {count_of_pass} ***  ')
-                    reload_page()
-            else:
-                # Warning alert (yellow)
-                st.warning("⚠️ Number of IDs and/or batch ids to Generate can not be 0!")
-
+# Right column - Generation panel
+with col1:
+    render_generation_panel()
