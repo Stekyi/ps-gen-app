@@ -16,7 +16,7 @@ def hide_streamlit_elements():
     hide_style = """
         <style>
         /* Hide GitHub icon */
-        #MainMenu {visibility: hidden;}
+        #MainMenu {visibility: hiddestran;}
 
         /* Hide Streamlit footer */
         footer {visibility: hidden;}
@@ -42,27 +42,30 @@ def hide_streamlit_elements():
 hide_streamlit_elements()
 
 
-st.title('🎫 Generate Your Private Session ID')
+st.markdown(
+    "<h4><b>Generate your private Session ID</b></h4>",
+    unsafe_allow_html=True
+)
 
 # Instructions section
 st.info("""
 **How it works:**
-- The assigned session ID can only be used once; for the survey
-- Enter your passport ID and click the button to generate a session ID
-- There is no link between your passport and the session ID (anonymous voting)
+- The assigned Session ID can only be used once to complete a survey
+- Enter your Passport # and click the button to generate a Session ID
+- Please note that there is no link between your Passport # and the Session ID to ensure anonymous voting
 """)
 
 st.divider()
 
 # Main form
 with st.form(key='session_form', clear_on_submit=False):
-    st.subheader("Enter Your Passport ID")
+    st.subheader("Enter your Passport #:")
 
     pass_num = st.text_input(
-        label='Passport ID:',
-        placeholder='Enter your assigned passport number',
+        label='Passport #:',
+        placeholder='Enter your assigned Passport #',
         max_chars=50,
-        help="Enter the passport ID that was assigned to you"
+        help="Enter the Passport # that was assigned to you"
     ).strip().upper()
 
     col1, col2, col3 = st.columns([1, 1, 1])
@@ -76,9 +79,9 @@ with st.form(key='session_form', clear_on_submit=False):
     if submit_button:
         # Validation
         if not pass_num:
-            st.error("⚠️ Please enter a passport ID")
+            st.error("⚠️ Please enter a Passport #")
         else:
-            with st.spinner('🔄 Verifying passport and generating session ID...'):
+            with st.spinner('🔄 Verifying Passport # and generating Session ID...'):
                 try:
                     pass_status = asp.assign_passport(pass_num)
 
@@ -96,17 +99,17 @@ with st.form(key='session_form', clear_on_submit=False):
                         st.warning("⚠️ **Important:** Copy and use this Session ID to complete your survey. It will only be displayed once!")
 
                         # Optional: Add copy button using custom component
-                        st.info("💡 Use this Session ID to access your survey")
+                        st.info("💡 Use this Session ID to access the survey")
 
                     else:
                         st.error("""
                         ❌ **Authentication Failed**
 
-                        Your passport ID is either:
+                        Your Passport # is either:
                         - Invalid or not found in the system
-                        - Already used to generate a session ID
+                        - Already used to generate a Session ID
 
-                        Please verify your passport ID or contact support.
+                        Please verify your Passport # or contact support.
                         """)
 
                 except Exception as e:
@@ -118,11 +121,11 @@ st.divider()
 with st.expander("ℹ️ Need Help?"):
     st.markdown("""
     **Common Issues:**
-    - Make sure you're entering the correct passport ID
-    - Passport IDs are not case-insensitive
-    - Each passport can only generate one session ID
+    - Make sure you're entering the correct Passport #
+    - Passport # is not case-insensitive
+    - Each Passport # can only generate one Session ID
     - Session IDs are single-use only
 
     **Security Note:**
-    Your session ID is completely anonymous and cannot be traced back to your passport ID.
+    Your Session ID is completely anonymous and cannot be traced back to your Passport #.
     """)
