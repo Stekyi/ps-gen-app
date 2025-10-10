@@ -175,7 +175,7 @@ with col2:
         label="Download pass as CSV",
         filename="passport_table.csv",
         filter_type=filter_option,
-        hide_status_threshold=0.25,
+        hide_status_threshold=0.10,
         key_prefix="passport"
     )
 
