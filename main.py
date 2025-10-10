@@ -43,7 +43,7 @@ hide_streamlit_elements()
 
 
 st.markdown(
-    "<h4><b>Generate your private Session ID</b></h4>",
+    "<h5><b>Welcome to the NGA Session IDs Page</b></h5>",
     unsafe_allow_html=True
 )
 
@@ -52,21 +52,23 @@ st.info("""
 **How it works:**
 - The assigned Session ID can only be used once to complete a survey
 - Enter your Passport # and click the button to generate a Session ID
-- Please note that there is no link between your Passport # and the Session ID to ensure anonymous voting
+- Please note that there is no link between your Passport # and the Session ID issued to you, to ensure anonymous voting
 """)
 
 st.divider()
 
 # Main form
 with st.form(key='session_form', clear_on_submit=False):
-    st.subheader("Enter your Passport #:")
+    st.markdown("<h5><b>Enter your Passport #:</b></h5>",
+    unsafe_allow_html=True)
 
     pass_num = st.text_input(
-        label='Passport #:',
-        placeholder='Enter your assigned Passport #',
+        label='''#''',
+        placeholder='''#''',
         max_chars=50,
         help="Enter the Passport # that was assigned to you"
     ).strip().upper()
+
 
     col1, col2, col3 = st.columns([1, 1, 1])
     with col2:
@@ -103,18 +105,17 @@ with st.form(key='session_form', clear_on_submit=False):
 
                     else:
                         st.error("""
-                        ❌ **Authentication Failed**
-
-                        Your Passport # is either:
-                        - Invalid or not found in the system
-                        - Already used to generate a Session ID
-
-                        Please verify your Passport # or contact support.
+                        ❌ **Authentication Failed** \n
+                        
+                        Your Passport # is either invalid or has already been assigned/used by someone else.
+                        \nKindly verify your Passport # and try again or contact the issuer for help.
+                        
+                        
                         """)
 
                 except Exception as e:
                     st.error(f"❌ An unexpected error occurred: {str(e)}")
-                    st.info("Please try again or contact support if the problem persists.")
+                    st.info("Please try again or contact the issuer if the problem persists.")
 
 # Footer with additional information
 st.divider()
