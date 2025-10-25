@@ -74,7 +74,7 @@ def create_status_dataframe(data_dict, filter_type=None, hide_status_threshold=N
     if filter_type and filter_type != 'All':
         data_list = [item for item in data_list if item[2] == filter_type]
 
-    df = pd.DataFrame(data_list, columns=['passport#', 'status', 'Type_of_ID', 'Batch'])
+    df = pd.DataFrame(data_list, columns=['#', 'status', 'Type_of_ID', 'Batch'])
 
     if hide_status_threshold is not None and len(data_list) > 0:
         assigned_count = sum(1 for _, status, _, _ in data_list if status == STATUS_ASSIGNED)
@@ -121,8 +121,8 @@ def render_generation_panel():
     count_assigned = sum(1 for _, status, _, _ in assigned_passports if status == STATUS_ASSIGNED)
 
     # Display counter
-    st.text(f'Assigned Pass and Sess_id: *** {count_assigned} ***  ')
-    st.write('Generate fresh session and passport blocks')
+    st.text(f'Assigned Visa and Session id: *** {count_assigned} ***  ')
+    st.write('Generate fresh session and Visa blocks')
 
     # Get available batches
     existing_batches = gd.get_existing_batches()
@@ -142,7 +142,9 @@ def render_generation_panel():
         can_generate = False
 
     # Generate button
-    gen_pass = st.button(label='Generate #s')
+    gen_pass = st.button(label='Generate Visa & Session #s')
+    st.write('Use the button below to generate Passport #, Pay attention to the Batch# before generating, Passport# are not in sync with Visa and Session # ')
+    gen_real_pass = st.button(label='Generate Passport #s')
 
     if gen_pass:
         if not can_generate or number_of_ids == 0:
@@ -154,9 +156,18 @@ def render_generation_panel():
                 st.success('New Numbers Generated, refresh page to load')
                 reload_page()
 
+    if gen_real_pass:
+        if not can_generate or number_of_ids == 0:
+            st.warning("⚠️ Number of IDs must be greater than 0 and a batch must be available!")
+        else:
+            with st.spinner('Generating, please wait...'):
+                gd.dump_real_passport_data(number_of_ids, type_of_id, batch_num)
+                st.success('New Passport Generated, refresh page to load')
+                reload_page()
+
 
 # Main layout
-col1, col2, col3 = st.columns([4, 4, 4])
+col1, col2, col3, col4 = st.columns([3, 3, 3, 3])
 
 # Global filter at the top
 st.sidebar.header("Filter Options")
@@ -172,11 +183,11 @@ with col2:
     passports = gd.get_pass_data()
     render_data_table(
         passports,
-        label="Download pass as CSV",
-        filename="passport_table.csv",
+        label="Download Visa as CSV",
+        filename="visa_table.csv",
         filter_type=filter_option,
         hide_status_threshold=0.10,
-        key_prefix="passport"
+        key_prefix="visa"
     )
 
 # Middle column - Session data
@@ -184,12 +195,24 @@ with col3:
     sessions = gd.get_sess_data()
     render_data_table(
         sessions,
-        label="Download table as CSV",
+        label="Download Session table as CSV",
         filename="session_table.csv",
         filter_type=filter_option,
         hide_status_threshold=0.10,
         key_prefix="session"
     )
+
+with col4:
+    real_pass = gd.get_real_pass_data()
+    render_data_table(
+        real_pass,
+        label="Download Passport table as CSV",
+        filename="passports_table.csv",
+        filter_type=filter_option,
+        hide_status_threshold=0.10,
+        key_prefix="realPass"
+    )
+
 
 # Right column - Generation panel
 with col1:
