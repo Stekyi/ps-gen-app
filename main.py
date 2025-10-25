@@ -51,22 +51,22 @@ st.markdown(
 st.info("""
 **How it works:**
 - The assigned Session ID can only be used once to complete a survey
-- Enter your Passport # and click the button to generate a Session ID
-- Please note that there is no link between your Passport # and the Session ID issued to you, to ensure anonymous voting
+- Enter your Visa # and click the button to generate a Session ID
+- Please note that there is no link between your Visa # and the Session ID issued to you, to ensure anonymous voting
 """)
 
 st.divider()
 
 # Main form
 with st.form(key='session_form', clear_on_submit=False):
-    st.markdown("<h5><b>Enter your Passport #:</b></h5>",
+    st.markdown("<h5><b>Enter your Visa #:</b></h5>",
     unsafe_allow_html=True)
 
     pass_num = st.text_input(
         label='''#''',
         placeholder='''#''',
         max_chars=50,
-        help="Enter the Passport # that was assigned to you"
+        help="Enter the Visa # that was assigned to you"
     ).strip().upper()
 
 
@@ -81,9 +81,9 @@ with st.form(key='session_form', clear_on_submit=False):
     if submit_button:
         # Validation
         if not pass_num:
-            st.error("⚠️ Please enter a Passport #")
+            st.error("⚠️ Please enter a Visa #")
         else:
-            with st.spinner('🔄 Verifying Passport # and generating Session ID...'):
+            with st.spinner('🔄 Verifying Visa # and generating Session ID...'):
                 try:
                     pass_status = asp.assign_passport(pass_num)
 
@@ -107,8 +107,8 @@ with st.form(key='session_form', clear_on_submit=False):
                         st.error("""
                         ❌ **Authentication Failed** \n
                         
-                        Your Passport # is either invalid or has already been assigned/used by someone else.
-                        \nKindly verify your Passport # and try again or contact the issuer for help.
+                        Your Visa # is either invalid or has already been assigned/used by someone else.
+                        \nKindly verify your Visa # and try again or contact the issuer for help.
                         
                         
                         """)
@@ -122,11 +122,11 @@ st.divider()
 with st.expander("ℹ️ Need Help?"):
     st.markdown("""
     **Common Issues:**
-    - Make sure you're entering the correct Passport #
-    - Passport # is not case-insensitive
-    - Each Passport # can only generate one Session ID
+    - Make sure you're entering the correct Visa #
+    - visa # is not case-insensitive
+    - Each Visa # can only generate one Session ID
     - Session IDs are single-use only
 
     **Security Note:**
-    Your Session ID is completely anonymous and cannot be traced back to your Passport #.
+    Your Session ID is completely anonymous and cannot be traced back to your Visa #.
     """)
