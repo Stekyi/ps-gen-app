@@ -88,7 +88,7 @@ with st.form(key='session_form', clear_on_submit=False):
                     pass_status = asp.assign_passport(pass_num)
 
                     if pass_status:
-                        sess_id = asp.assign_session()
+                        sess_id = asp.assign_session(pass_num)
 
                         # Success message with session ID
                         st.success("✅ Session ID generated successfully!")

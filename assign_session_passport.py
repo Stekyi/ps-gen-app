@@ -60,15 +60,15 @@ def assign_passport(pass_num):
 
 
 
-def assign_session():
+def assign_session(visa_num):
     """Assigns a random unassigned session and marks it as assigned."""
     # Get fresh data from Firebase
     sess_ref = ref_sess.get()
-
+    typ_of_visa = visa_num[1]
     if not sess_ref:
         raise ValueError("No sessions found in database.")
 
-    unassigned_sess = [k for k, v in sess_ref.items() if v[1] == 'unassigned']
+    unassigned_sess = [k for k, v in sess_ref.items() if v[1] == 'unassigned' and v[2]==typ_of_visa]
 
     if not unassigned_sess:
         raise ValueError("No unassigned sessions available.")
@@ -84,9 +84,9 @@ def assign_session():
 
 if __name__ == '__main__':
     try:
-        pass_num = assign_passport('PDB435065') #     PDB461044 PDB474185
+        pass_num = assign_passport('VGB399370') #     PDB461044 PDB474185
         if pass_num:
-            sess_id = assign_session()
+            sess_id = assign_session('VGB399370')
             print(f'Your passport is {pass_num} and your session is {sess_id}')
         else:
             print('Number not valid or already utilised')
