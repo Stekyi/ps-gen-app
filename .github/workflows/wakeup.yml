@@ -1,0 +1,24 @@
+name: Scheduled Ping to Keep Apps Awake
+on:
+  schedule:
+    # Run the job every 10 hours. This is '0 */10 * * *'
+    # Streamlit Cloud's sleep threshold is currently around 12 hours.
+    - cron: '0 */10 * * *'
+  # Allows you to manually trigger the workflow from the Actions tab
+  workflow_dispatch: 
+
+jobs:
+  ping_job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping App 1: fzwigepq746bvjjgpjntu7
+        # Use a lightweight public action to send an HTTP request
+        uses: soul-wish/ping-url-javascript-action@v1.5 
+        with:
+          url: 'https://ps-gen-app-fzwigepq746bvjjgpjntu7.streamlit.app/'
+
+      - name: Ping App 2: lgn5tcwnjfuu4hankxgjwc
+        # Use the same action for the second app
+        uses: soul-wish/ping-url-javascript-action@v1.5 
+        with:
+          url: 'https://ps-gen-app-lgn5tcwnjfuu4hankxgjwc.streamlit.app/'
