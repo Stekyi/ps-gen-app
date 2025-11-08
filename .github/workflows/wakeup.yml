@@ -8,10 +8,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Ping App 1 fzwigepq746bvjjgpjntu7
-        uses: soul-wish/ping-url-javascript-action@v1
-        with:
-          url: 'https://ps-gen-app-fzwigepq746bvjjgpjntu7.streamlit.app/'
+        run: curl -I https://ps-gen-app-fzwigepq746bvjjgpjntu7.streamlit.app/
       - name: Ping App 2 lgn5tcwnjfuu4hankxgjwc
-        uses: soul-wish/ping-url-javascript-action@v1
-        with:
-          url: 'https://ps-gen-app-lgn5tcwnjfuu4hankxgjwc.streamlit.app/'
+        run: curl -I https://ps-gen-app-lgn5tcwnjfuu4hankxgjwc.streamlit.app/
