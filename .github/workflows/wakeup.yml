@@ -7,11 +7,11 @@ jobs:
   ping_job:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping App 1: fzwigepq746bvjjgpjntu7
+      - name: Ping App 1 fzwigepq746bvjjgpjntu7
         uses: soul-wish/ping-url-javascript-action@v1
         with:
           url: 'https://ps-gen-app-fzwigepq746bvjjgpjntu7.streamlit.app/'
-      - name: Ping App 2: lgn5tcwnjfuu4hankxgjwc
+      - name: Ping App 2 lgn5tcwnjfuu4hankxgjwc
         uses: soul-wish/ping-url-javascript-action@v1
         with:
           url: 'https://ps-gen-app-lgn5tcwnjfuu4hankxgjwc.streamlit.app/'
